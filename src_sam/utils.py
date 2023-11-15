@@ -55,7 +55,7 @@ def get_bounding_box_center(ground_truth_map, bbox_threshold):
 
     return bbox, center
 
-    
+
 def find_contour(img):
     img_numpy = img.numpy().astype(np.uint8)
     contours, _ = cv2.findContours(img_numpy, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -70,6 +70,7 @@ def find_contour(img):
             seg_out = seg_in.copy()
             allseg.append(torch.from_numpy(seg_out).to(torch.float))
     return allseg
+
 
 
 class SAMDataset(torch.utils.data.Dataset):

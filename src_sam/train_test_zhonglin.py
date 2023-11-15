@@ -10,6 +10,7 @@ from prepare_dataset_zhonglin import zhonglindataloader, create_dataset
 import transcript
 from test_only import test
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+import config
 
 
 
@@ -21,8 +22,8 @@ def train_test(traindataset, testdataset, savedir, bbox_threshold, prompt_mode):
                                bbox_threshold=bbox_threshold)
     test_dataset = SAMDataset(dataset=testdataset, processor=processor,
                               bbox_threshold=bbox_threshold)
-    train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False)
+    train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True, num_workers=8)
+    test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=False, num_workers=8)
     model = SamModel.from_pretrained("facebook/sam-vit-base")
     for name, param in model.named_parameters():
         if name.startswith("vision_encoder") or name.startswith("prompt_encoder"):
@@ -98,7 +99,12 @@ def train_test(traindataset, testdataset, savedir, bbox_threshold, prompt_mode):
 if __name__ == "__main__":
     bbox_threshold = 10
     prompt_mode = 'box'
-    savedir = '/home/zhonglil/ondemand/data/sys/myjobs/default/SAM_seg/test-sam-zhonglin'+f'-bbox={bbox_threshold}-prompt={prompt_mode}-updata'
+    root_dir = config.root_dir
+    path_to_test_data = config.path_to_test_data
+    path_to_train_data = config.path_to_train_data
+    path_to_val_data = config.path_to_val_data
+
+    savedir = root_dir + f'-bbox={bbox_threshold}-prompt={prompt_mode}-updata'
     init_env(seed_value=42)
     if not os.path.exists(savedir):
         os.makedirs(savedir)
@@ -106,11 +112,11 @@ if __name__ == "__main__":
     copytree_code(os.getcwd(), savedir)
     transcript.start(f'{savedir}/logfile.log', mode='a')
     # prepare training data
-    train_loader = zhonglindataloader(datasetdir='/home/zhonglil/ondemand/data/sys/myjobs/default/SAM_seg/train_data.mat', delete_zeros=True)
+    train_loader = zhonglindataloader(datasetdir=path_to_train_data, delete_zeros=True)
     train_loader.convert_data()
     traindataset = create_dataset(images=train_loader.meta['spect'], labels=train_loader.meta['seg'])
     # prepare validation data
-    val_loader = zhonglindataloader(datasetdir='/home/zhonglil/ondemand/data/sys/myjobs/default/SAM_seg/val_data.mat', delete_zeros = True)
+    val_loader = zhonglindataloader(datasetdir=path_to_val_data, delete_zeros = True)
     val_loader.convert_data()
     valdataset = create_dataset(images=val_loader.meta['spect'], labels=val_loader.meta['seg'])
     train_test(traindataset=traindataset, 
@@ -125,7 +131,7 @@ if __name__ == "__main__":
     with torch.no_grad():
         transcript.start(f'{savedir}/logfile.log', mode='a')
         print("################# START TESTING ###################")
-        test_loader = zhonglindataloader(datasetdir='/home/zhonglil/ondemand/data/sys/myjobs/default/SAM_seg/test_data.mat', delete_zeros = False)
+        test_loader = zhonglindataloader(datasetdir=path_to_test_data, delete_zeros = False)
         test_loader.convert_data()
         testdataset = create_dataset(images=test_loader.meta['spect'], labels=test_loader.meta['seg'])
         test(testdataset=testdataset, 

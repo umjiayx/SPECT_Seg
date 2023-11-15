@@ -10,6 +10,7 @@ from grid_sample import *
 import matplotlib.patches as patches
 from utils import init_env, find_contour, get_bounding_box_center
 import transcript
+import config
 
 # import matlab.engine
 # eng = matlab.engine.start_matlab()
@@ -137,7 +138,9 @@ def show_mask(mask, ax, random_color=False):
 
 
 if __name__ == "__main__":
-    loader = zhonglindataloader(datasetdir='/home/zhonglil/ondemand/data/sys/myjobs/default/SAM_seg/test_data.mat', delete_zeros=False)
+    path_to_test_data = config.path_to_test_data
+
+    loader = zhonglindataloader(datasetdir=path_to_test_data, delete_zeros=False)
     loader.convert_data()
     init_env(seed_value=42)
     bbox_threshold = 10

@@ -53,6 +53,7 @@ def test(testdataset, savedir, bbox_threshold, prompt_mode):
     
     
 if __name__ == "__main__":
+    print("This part should NOT be run!")
     savedir = 'C:/Users/zhonglil/Dropbox (University of Michigan)/Lu177_tumor_segmentation/patient_data/test-sam-103-bbox=30'
     init_env(seed_value=42)
     if not os.path.exists(savedir):

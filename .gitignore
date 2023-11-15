@@ -3,3 +3,7 @@
 *.png
 *.log
 *.zip
+test-sam*
+__pycache__/
+*.pyc
+

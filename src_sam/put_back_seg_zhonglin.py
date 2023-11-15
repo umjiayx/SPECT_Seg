@@ -7,6 +7,7 @@ import SimpleITK as sitk
 # jl = Julia(compiled_modules=False)
 # from julia.AVSfldIO import fld_read, fld_write
 from prepare_dataset_zhonglin import zhonglindataloader
+import config
 
 def read_image(path):
     return sitk.GetArrayFromImage(sitk.ReadImage(path))
@@ -15,8 +16,8 @@ def write_image(image, path):
     sitk.WriteImage(sitk.GetImageFromArray(image), path)
     
 if __name__ == "__main__":
-    loader = zhonglindataloader(datasetdir='/home/zhonglil/ondemand/data/sys/myjobs/default/SAM_seg/test_data.mat', delete_zeros=False)
-    result_path = '/home/zhonglil/ondemand/data/sys/myjobs/default/SAM_seg/test-sam-zhonglin-bbox=10-prompt=box-1102'
+    loader = zhonglindataloader(datasetdir=config.path_to_test_data, delete_zeros=False)
+    result_path = config.root_dir + '-zhonglin-bbox=10-prompt=box-1102'
     outputseg = read_image(os.path.join(result_path, 'outputseg.nii.gz'))
     trueseg = read_image(os.path.join(result_path, 'trueseg.nii.gz'))
     # outputseg = fld_read(os.path.join(result_path, 'outputseg.fld'))
